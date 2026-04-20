@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CTA策略报告 - 一次函数模型（1小时周期）</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+            margin: 40px auto;
+            max-width: 1200px;
+            padding: 20px;
+            background-color: #f9f9fc;
+            color: #1e2b3c;
+            line-height: 1.6;
+        }
+        .report-container {
+            background-color: white;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            border-radius: 20px;
+            padding: 40px;
+        }
+        h1 {
+            font-size: 28px;
+            border-left: 8px solid #0b5e7c;
+            padding-left: 20px;
+            margin-top: 0;
+            color: #0b3b4a;
+        }
+        h2 {
+            font-size: 22px;
+            margin-top: 40px;
+            margin-bottom: 16px;
+            border-bottom: 2px solid #e0e7ef;
+            padding-bottom: 8px;
+            color: #144a66;
+        }
+        h3 {
+            font-size: 18px;
+            margin: 20px 0 10px;
+            color: #1f4a6e;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 20px 0;
+            background: #f2f6fa;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+        }
+        th, td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid #d0ddee;
+        }
+        th {
+            background-color: #d9e4f0;
+            font-weight: 600;
+        }
+        tr:last-child td {
+            border-bottom: none;
+        }
+        .note {
+            background-color: #f0f5fb;
+            padding: 20px 24px;
+            border-radius: 16px;
+            font-style: italic;
+            border-left: 6px solid #2b7a9c;
+            margin: 30px 0;
+        }
+        .chart-container {
+            margin: 40px 0;
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 24px;
+            box-shadow: 0 8px 18px rgba(0,40,70,0.08);
+        }
+        .footer {
+            margin-top: 50px;
+            font-size: 15px;
+            color: #4e657b;
+            border-top: 1px dashed #b3c7db;
+            padding-top: 20px;
+            text-align: right;
+        }
+    </style>
+    <!-- 引入 Chart.js 用于绘制曲线 -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+<div class="report-container">
+    <h1>恒复里投资 · CTA策略报告（一次函数/1小时周期）</h1>
+    <p style="font-size: 18px; color: #2f5575;"><strong>策略编号：</strong>CTA-20211102-01 &nbsp;&nbsp; <strong>策略经理：</strong>RandyBrown &nbsp;&nbsp; <strong>报告日期：</strong>2021.11.02 &nbsp;&nbsp; <strong>测试资金：</strong>10万元</p>
+    <hr style="border: none; border-top: 2px solid #cfdeed;" />
+
+    <!-- 1. 策略描述 -->
+    <h2>1. 策略描述</h2>
+    <h3>1.1 策略类型</h3>
+    <p>CTA趋势跟踪策略</p>
+    <h3>1.2 策略理念</h3>
+    <p>本策略基于一次函数线性回归模型，利用1小时K线数据，计算过去20个周期的收盘价线性回归斜率，判断当前趋势方向。当斜率大于阈值0.5时做多，小于负阈值-0.5时做空，斜率回归零轴附近（|斜率|&lt;0.1）时平仓。模型假设价格在一定时间内具有线性趋势特征。</p>
+    <h3>1.3 风控措施</h3>
+    <ul>
+        <li>固定比例止损：单笔亏损超过2%强制平仓</li>
+        <li>时间止损：持仓超过24小时未达预期平仓</li>
+        <li>动态跟踪止盈：基于ATR(14)设定移动止盈线</li>
+    </ul>
+    <h3>1.4 关键参数</h3>
+    <ul>
+        <li>线性回归周期：20期（1小时K线）</li>
+        <li>开仓斜率阈值：0.5</li>
+        <li>平仓斜率阈值：0.1</li>
+        <li>ATR周期：14</li>
+        <li>止损比例：2%</li>
+    </ul>
+    <h3>1.5 策略交易标的</h3>
+    <p>螺纹钢主力连续合约（RB）</p>
+    <h3>1.6 分析周期</h3>
+    <p>1小时K线</p>
+
+    <!-- 2. 历史测试：风险收益特征的参数敏感性测试 -->
+    <h2>2. 历史测试：风险收益特征的参数敏感性测试</h2>
+    <h3>2.1 策略交易成本假设</h3>
+    <ul>
+        <li>开平仓价格：以收盘价成交</li>
+        <li>手续费：万分之0.5（单边）</li>
+        <li>冲击成本：0.1%（双边）</li>
+    </ul>
+    <h3>2.2 历史测试起始时间</h3>
+    <p>2018年1月1日 — 2021年10月31日</p>
+    <h3>2.3 风险收益特征的参数敏感性</h3>
+    <table>
+        <thead>
+            <tr><th>参数</th><th>夏普率</th><th>年化收益率</th><th>卡玛比</th><th>换手率</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>周期=15，阈值=0.4</td><td>1.32</td><td>18.5%</td><td>1.12</td><td>8.3</td></tr>
+            <tr><td><strong>周期=20，阈值=0.5</strong></td><td><strong>1.48</strong></td><td><strong>21.3%</strong></td><td><strong>1.35</strong></td><td><strong>7.1</strong></td></tr>
+            <tr><td>周期=25，阈值=0.6</td><td>1.21</td><td>16.8%</td><td>1.02</td><td>6.2</td></tr>
+        </tbody>
+    </table>
+
+    <!-- 3. 历史测试：策略收益率分析（含图表） -->
+    <h2>3. 历史测试：策略收益率分析</h2>
+    <h3>3.1 策略收益率生成假设</h3>
+    <p>采用固定参数组合（周期=20，斜率阈值=0.5），信号生成后次日开盘价成交，回测中不考虑滑点优化。</p>
+    
+    <h3>3.2 累计收益和回撤图示</h3>
+    <div class="chart-container">
+        <canvas id="performanceChart" style="width:100%; max-height:500px; height:450px;"></canvas>
+    </div>
+
+    <h3>3.3 策略风险收益特征</h3>
+    <table>
+        <tr><th>指标</th><th>数值</th></tr>
+        <tr><td>年化收益率</td><td>21.3%</td></tr>
+        <tr><td>最大回撤</td><td>-15.8%</td></tr>
+        <tr><td>夏普比率</td><td>1.48</td></tr>
+        <tr><td>卡玛比率</td><td>1.35</td></tr>
+        <tr><td>胜率</td><td>52.4%</td></tr>
+        <tr><td>盈亏比</td><td>1.82</td></tr>
+    </table>
+
+    <h3>3.4 策略相关性分析</h3>
+    <ul>
+        <li>与南华商品指数相关性：0.42</li>
+        <li>与螺纹钢主力连续合约相关性：0.78</li>
+    </ul>
+
+    <!-- 4. 风险控制分析和指标 -->
+    <h2>4. 风险控制分析和指标</h2>
+    <h3>4.1 策略回撤原因分析</h3>
+    <ul>
+        <li>2020年3月：疫情初期市场剧烈波动，趋势频繁反转，模型滞后</li>
+        <li>2021年5月：政策干预导致螺纹钢价格剧烈震荡，线性趋势不明显</li>
+    </ul>
+    <h3>4.2 估计策略资金容量</h3>
+    <p>约5000万元（基于螺纹钢主力合约流动性与冲击成本估算）</p>
+    <h3>4.3 建议回撤幅度预警线</h3>
+    <ul>
+        <li>预警线：-10%</li>
+        <li>强平线：-20%</li>
+    </ul>
+    <h3>4.4 建议回撤时间预警线</h3>
+    <ul>
+        <li>预警时间：连续回撤超过1个月</li>
+        <li>强平时间：连续回撤超过2个月</li>
+    </ul>
+
+    <!-- 5. 投委会决议 -->
+    <h2>5. 投委会决议</h2>
+    <table>
+        <tr><th>项目</th><th>内容</th></tr>
+        <tr><td>测试资金量</td><td>10万元</td></tr>
+        <tr><td>测试账户</td><td>CTA仿真账户 #RB-CTA-01</td></tr>
+        <tr><td>测试期时长</td><td>6个月（2021.11.15 — 2022.5.14）</td></tr>
+        <tr><td>投委会签字</td><td>____________________</td></tr>
+    </table>
+
+    <div class="footer">报告生成时间：2026.03.18 &nbsp;|&nbsp; 数据模拟仅供示例</div>
+</div>
+
+<script>
+(function() {
+    // 生成日期标签：2018年1月至2021年10月（共46个月）
+    const labels = [];
+    const startYear = 2018, startMonth = 0; // 0=一月
+    for (let i = 0; i < 46; i++) {
+        let y = startYear + Math.floor((startMonth + i) / 12);
+        let m = ((startMonth + i) % 12) + 1;
+        labels.push(`${y}-${m.toString().padStart(2,'0')}`);
+    }
+
+    // 模拟累计净值曲线（确定性函数，保证每次加载一致）
+    // 净值 = 1 + 0.8*(i/45) + 0.15*Math.sin(i*0.7) - 0.1*Math.cos(i*0.3)
+    // 再稍作调整使走势自然，最大回撤约-15%
+    const nav = [];
+    for (let i = 0; i < labels.length; i++) {
+        let t = i / 45; // 0~1
+        // 趋势部分：从1到约1.8（年化21.3%对应3年复利约1.77）
+        let trend = 1 + 0.78 * t; 
+        // 波动部分：由正弦余弦组合，幅度约0.12，产生回撤
+        let wave = 0.12 * Math.sin(i * 0.55) + 0.06 * Math.cos(i * 0.9) - 0.02 * Math.sin(i * 1.8);
+        // 保证净值始终为正
+        let value = trend + wave;
+        // 让最低点不低于0.85（最大回撤从峰值下来约-15%）
+        // 但我们需要后面计算回撤，所以保持原样
+        nav.push(Number(value.toFixed(4)));
+    }
+
+    // 计算回撤序列（%）
+    const drawdown = [];
+    let peak = nav[0];
+    for (let i = 0; i < nav.length; i++) {
+        if (nav[i] > peak) peak = nav[i];
+        let dd = (nav[i] / peak - 1) * 100; // 负值或0
+        drawdown.push(Number(dd.toFixed(2)));
+    }
+
+    // 绘制图表
+    const ctx = document.getElementById('performanceChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: '累计净值 (左轴)',
+                    data: nav,
+                    borderColor: '#0f6b9e',
+                    backgroundColor: 'rgba(15,107,158,0.02)',
+                    borderWidth: 2.5,
+                    pointRadius: 0,
+                    tension: 0.1,
+                    yAxisID: 'y',
+                    fill: false,
+                },
+                {
+                    label: '回撤 % (右轴)',
+                    data: drawdown,
+                    borderColor: '#d44c4c',
+                    backgroundColor: 'rgba(220,80,80,0.1)',
+                    borderWidth: 2,
+                    pointRadius: 0,
+                    tension: 0.1,
+                    yAxisID: 'y1',
+                    fill: true,
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index' },
+            plugins: {
+                legend: { position: 'top', labels: { usePointStyle: true, boxWidth: 8 } },
+                tooltip: { enabled: true, mode: 'index' }
+            },
+            scales: {
+                x: { 
+                    ticks: { maxRotation: 45, minRotation: 30, maxTicksLimit: 20 },
+                    title: { display: true, text: '日期 (月)' }
+                },
+                y: {
+                    position: 'left',
+                    title: { display: true, text: '净值' },
+                    min: 0.8,  // 留一点空间
+                    max: 2.0,
+                    grid: { color: '#e4eef7' }
+                },
+                y1: {
+                    position: 'right',
+                    title: { display: true, text: '回撤 (%)' },
+                    min: -25,
+                    max: 5,
+                    grid: { drawOnChartArea: false }, // 不覆盖左轴网格
+                    ticks: { callback: (v) => v + '%' }
+                }
+            }
+        }
+    });
+})();
+</script>
+
+<!-- 额外说明 -->
+<div style="margin-top: 20px; font-size: 14px; color: #5b7f9c; text-align: center;">* 以上图表基于模拟数据生成，仅用于展示报告格式，不构成投资建议。</div>
+</body>
+</html>
