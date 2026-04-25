@@ -38,15 +38,37 @@ def check_stocks(context):
 
     # 选出低市值的股票，构成buylist
     df = get_fundamentals(q)
-    buylist =list(df['code'])
+    buylist = list(df['code'])
 
     # 过滤停牌股票
     buylist = filter_paused_stock(buylist)
+
+    # 过滤：当日成交量相对昨日放大 1.5 倍以上
+    def volume_expanded(stock):
+        try:
+            volumes = attribute_history(stock, 2, '1d', 'volume')['volume'].values
+            if len(volumes) < 2:
+                return False
+
+            yesterday_volume = volumes[0]
+            today_volume = volumes[1]
+            if yesterday_volume <= 0:
+                return False
+
+            return today_volume >= yesterday_volume * 1.5
+        except:
+            return False
+
+    buylist = [s for s in buylist if volume_expanded(s)]
 
     return buylist[:g.stocknum]
   
 ## 交易函数
 def trade(context):
+        # --- 新增：9月不参与买卖的逻辑 ---
+    # 获取当前日期
+    current_date = context.current_dt
+
     if g.days%g.refresh_rate == 0:
 
         ## 获取持仓列表
@@ -55,6 +77,12 @@ def trade(context):
         if len(sell_list) > 0 :
             for stock in sell_list:
                 order_target_value(stock, 0)
+    
+        # 判断月份是否为 9 月
+        if current_date.month == 9 or current_date.month == 1 or current_date.month == 12:
+            log.info("当前是9月，进入休息期，不进行任何调仓操作")
+            return # 直接跳出函数，不执行后面的逻辑
+        # ---------------------------
 
         ## 分配资金
         if len(context.portfolio.positions) < g.stocknum :
